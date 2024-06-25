@@ -24,9 +24,7 @@ setup(
         "gdown",
         "nemo_toolkit[asr]",
         "jiwer",
+        "pypesq @ https://github.com/vBaiCai/python-pesq/archive/master.zip",
         "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
-    ],
-    dependency_links=[
-        "https://github.com/vBaiCai/python-pesq/archive/master.zip",
     ],
 )
