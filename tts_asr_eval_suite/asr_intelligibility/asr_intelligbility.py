@@ -2,7 +2,7 @@ import os
 
 import nemo.collections.asr as nemo_asr
 
-from tts_asr_eval_suite.CER_WER.CER_WER import CERWER
+from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
 
 
 class ASRIntelligibility:
