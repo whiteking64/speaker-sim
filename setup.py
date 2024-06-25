@@ -11,7 +11,7 @@ setup(
     },
     install_requires=[
         "torch",
-        "fairseq",
+        "fairseq @ git+https://github.com/naba89/fairseq.git",
         "lightning",
         "packaging",
         "omegaconf",
