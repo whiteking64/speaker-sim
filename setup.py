@@ -16,7 +16,7 @@ setup(
         'tts_asr_eval_suite.secs': ['ckpt/*'],
     },
     install_requires=[
-        "cython",
+        "Cython",
         "protobuf<5",
         "torch",
         "lightning",
