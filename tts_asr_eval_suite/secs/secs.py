@@ -9,7 +9,8 @@ from tts_asr_eval_suite.secs.ecapa_tdnn import ECAPA_TDNN_SMALL
 WAVLM_LARGE_URL = 'https://drive.google.com/uc?id=1-aE1NfzpRCLxA4GUxX9ITI3F9LlbtEGP'
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-WAVLM_LARGE_PATH = os.path.join(THIS_DIR, 'ckpt', 'wavlm_large_finetune.pth')
+CKPT_DIR = os.path.join(THIS_DIR, 'ckpt')
+WAVLM_LARGE_PATH = os.path.join(CKPT_DIR, 'wavlm_large_finetune.pth')
 
 
 class SECS:
@@ -19,6 +20,7 @@ class SECS:
         self.sv_model = ECAPA_TDNN_SMALL(feat_dim=1024, feat_type="wavlm_large", config_path=None)
 
         if not os.path.exists(WAVLM_LARGE_PATH):
+            os.makedirs(CKPT_DIR, exist_ok=True)
             gdown.download(WAVLM_LARGE_URL, WAVLM_LARGE_PATH, quiet=False)
 
         state_dict = torch.load(WAVLM_LARGE_PATH, map_location=lambda storage, loc: storage)
