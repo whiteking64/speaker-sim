@@ -4,16 +4,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio.transforms as trans
-from .utils import UpstreamExpert
 
 ''' Res2Conv1d + BatchNorm1d + ReLU
 '''
 
 
 class Res2Conv1dReluBn(nn.Module):
-    '''
+    """
     in_channels == out_channels == channels
-    '''
+    """
 
     def __init__(self, channels, kernel_size=1, stride=1, padding=0, dilation=1, bias=True, scale=4):
         super().__init__()
@@ -195,7 +194,7 @@ class ECAPA_TDNN(nn.Module):
             if config_path is None:
                 self.feature_extract = torch.hub.load('s3prl/s3prl', feat_type)
             else:
-                self.feature_extract = UpstreamExpert(config_path)
+                raise NotImplementedError("config_path is not None, please use config_path=None")
             if len(self.feature_extract.model.encoder.layers) == 24 and hasattr(
                     self.feature_extract.model.encoder.layers[23].self_attn, "fp32_attention"):
                 self.feature_extract.model.encoder.layers[23].self_attn.fp32_attention = False
@@ -296,15 +295,3 @@ def ECAPA_TDNN_SMALL(feat_dim, emb_dim=256, feat_type='fbank', sr=16000, feature
     return ECAPA_TDNN(feat_dim=feat_dim, channels=512, emb_dim=emb_dim,
                       feat_type=feat_type, sr=sr, feature_selection=feature_selection, update_extract=update_extract,
                       config_path=config_path)
-
-
-
-
-if __name__ == '__main__':
-    x = torch.zeros(2, 32000)
-    model = ECAPA_TDNN_SMALL(feat_dim=768, emb_dim=256, feat_type='hubert_base', feature_selection="hidden_states",
-                             update_extract=False)
-
-    out = model(x)
-    # print(model)
-    print(out.shape)
