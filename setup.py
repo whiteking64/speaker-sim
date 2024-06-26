@@ -1,5 +1,10 @@
 from setuptools import setup, find_packages
 
+try:
+    from pypesq import pesq
+except ImportError:
+    print("Please first install pypesq (pip install pypesq@https://github.com/vBaiCai/python-pesq/archive/master.zip)")
+
 setup(
     name="tts_asr_eval_suite",
     version="0.1",
@@ -24,7 +29,6 @@ setup(
         "gdown",
         "nemo_toolkit[asr]",
         "jiwer",
-        "pypesq @ https://github.com/vBaiCai/python-pesq/archive/master.zip",
         "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
     ],
 )
