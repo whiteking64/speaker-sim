@@ -13,6 +13,7 @@ setup(
     include_package_data=True,
     package_data={
         'tts_asr_eval_suite.dnsmos': ['ckpt/DNSMOS/*.onnx', 'ckpt/pDNSMOS/*.onnx'],
+        'tts_asr_eval_suite.secs': ['ckpt/*'],
     },
     install_requires=[
         "protobuf<5",
