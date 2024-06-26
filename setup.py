@@ -1,13 +1,5 @@
 from setuptools import setup, find_packages
 
-try:
-    from pypesq import pesq
-    from Cython.Build import cythonize
-except ImportError:
-    print("Please first install pypesq "
-          "\n\t(pip install pypesq@https://github.com/vBaiCai/python-pesq/archive/master.zip)"
-          "\nand Cython (pip install Cython) before running setup.py")
-
 setup(
     name="tts_asr_eval_suite",
     version="0.1",
