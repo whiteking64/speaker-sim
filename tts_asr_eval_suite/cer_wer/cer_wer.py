@@ -37,17 +37,13 @@ class CERWER:
         with open(pred_transcripts_path, "r") as f:
             pred_transcripts = {line.split("\t")[0]: line.split("\t")[1] for line in f.readlines()}
 
-        output_file = os.path.join(os.path.dirname(pred_transcripts_path), "wer_cer.tsv")
-
-        if os.path.exists(output_file):
-            # Remove the file if it already exists
-            os.remove(output_file)
+        results = {'wer': {}, 'cer': {}}
 
         for fname in gt_transcripts.keys():
             wer = jiwer.wer(normalize_sentence(gt_transcripts[fname]), normalize_sentence(pred_transcripts[fname]))
             cer = jiwer.cer(normalize_sentence(gt_transcripts[fname]), normalize_sentence(pred_transcripts[fname]))
 
-            with open(output_file, "a") as f:
-                f.write(f"{fname}\t{wer}\t{cer}\n")
+            results['wer'][fname] = wer
+            results['cer'][fname] = cer
 
-        return output_file
+        return results

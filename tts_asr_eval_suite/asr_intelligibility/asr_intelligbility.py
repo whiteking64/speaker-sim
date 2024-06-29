@@ -32,6 +32,6 @@ class ASRIntelligibility:
             with open(output_file, "a") as f:
                 f.write(f"{audio_fname}\t{transcript}\n")
 
-        score_file = self.cer_wer(output_file, gt_transcripts_path)
+        cre_wer_scores = self.cer_wer(output_file, gt_transcripts_path)
 
-        return score_file
+        return cre_wer_scores

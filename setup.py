@@ -10,6 +10,8 @@ setup(
         'tts_asr_eval_suite.dnsmos': ['ckpt/DNSMOS/*.onnx', 'ckpt/pDNSMOS/*.onnx'],
     },
     install_requires=[
+        "pandas",
+        "tqdm",
         "huggingface_hub",
         "onnxruntime",
         "librosa",

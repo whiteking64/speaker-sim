@@ -10,7 +10,7 @@ INPUT_LENGTH = 9.01
 
 
 class DNSMOS:
-    def __init__(self, personalized_MOS=False) -> None:
+    def __init__(self, personalized_MOS=False, p808=False, ovrl=True, full=False) -> None:
 
         this_dir = os.path.dirname(os.path.abspath(__file__))
         p808_model_path = os.path.join(this_dir, 'ckpt', 'DNSMOS', 'model_v8.onnx')
@@ -22,6 +22,11 @@ class DNSMOS:
 
         self.onnx_sess = ort.InferenceSession(primary_model_path)
         self.p808_onnx_sess = ort.InferenceSession(p808_model_path)
+
+        self.full = full
+        self.p808 = p808
+        self.ovrl = ovrl
+        self.personalized_MOS = personalized_MOS
 
     def audio_melspec(self, audio, n_mels=120, frame_size=320, hop_length=160, sr=16000, to_db=True):
         mel_spec = librosa.feature.melspectrogram(y=audio, sr=sr, n_fft=frame_size + 1, hop_length=hop_length,
@@ -46,7 +51,7 @@ class DNSMOS:
 
         return sig_poly, bak_poly, ovr_poly
 
-    def __call__(self, fpath, is_personalized_MOS, return_p808=False, return_ovrl=True, return_details=False):
+    def __call__(self, fpath):
         aud, input_fs = sf.read(fpath)
         fs = SAMPLING_RATE
         if input_fs != fs:
@@ -80,7 +85,7 @@ class DNSMOS:
             p808_oi = {'input_1': p808_input_features}
             p808_mos = self.p808_onnx_sess.run(None, p808_oi)[0][0][0]
             mos_sig_raw, mos_bak_raw, mos_ovr_raw = self.onnx_sess.run(None, oi)[0][0]
-            mos_sig, mos_bak, mos_ovr = self.get_polyfit_val(mos_sig_raw, mos_bak_raw, mos_ovr_raw, is_personalized_MOS)
+            mos_sig, mos_bak, mos_ovr = self.get_polyfit_val(mos_sig_raw, mos_bak_raw, mos_ovr_raw, self.personalized_MOS)
             predicted_mos_sig_seg_raw.append(mos_sig_raw)
             predicted_mos_bak_seg_raw.append(mos_bak_raw)
             predicted_mos_ovr_seg_raw.append(mos_ovr_raw)
@@ -89,7 +94,7 @@ class DNSMOS:
             predicted_mos_ovr_seg.append(mos_ovr)
             predicted_p808_mos.append(p808_mos)
 
-        if return_details:
+        if self.full:
             clip_dict = {
                 'filename': fpath,
                 'len_in_sec': actual_audio_len / fs,
@@ -103,7 +108,7 @@ class DNSMOS:
                 'P808_MOS': np.mean(predicted_p808_mos)
             }
             return clip_dict
-        elif return_p808:
+        elif self.p808:
             np.mean(predicted_p808_mos)
-        elif return_ovrl:
+        elif self.ovrl:
             np.mean(predicted_mos_ovr_seg)

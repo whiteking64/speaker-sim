@@ -14,23 +14,23 @@ class SECS:
         self.sv_model = torch.jit.load(model_file, map_location=device)
         self.sv_model.half()
 
-    def __call__(self, audio1path, audio2path):
+    def __call__(self, prompt_path, gen_path):
 
-        audio_1, sr1 = torchaudio.load(audio1path)
-        audio_2, sr2 = torchaudio.load(audio2path)
+        prompt_audio, sr_prompt = torchaudio.load(prompt_path)
+        gen_audio, sr_gen = torchaudio.load(gen_path)
 
-        audio_1 = audio_1.to(self.device)
-        audio_2 = audio_2.to(self.device)
+        prompt_audio = prompt_audio.to(self.device)
+        gen_audio = gen_audio.to(self.device)
 
-        if sr1 != self.sr:
-            audio_1 = torchaudio.functional.resample(audio_1, sr1, self.sr)
+        if sr_prompt != self.sr:
+            prompt_audio = torchaudio.functional.resample(prompt_audio, sr_prompt, self.sr)
 
-        if sr2 != self.sr:
-            audio_2 = torchaudio.functional.resample(audio_2, sr2, self.sr)
+        if sr_gen != self.sr:
+            gen_audio = torchaudio.functional.resample(gen_audio, sr_gen, self.sr)
 
-        embedding1 = self.sv_model(audio_1)
-        embedding2 = self.sv_model(audio_2)
+        prompt_embedding = self.sv_model(prompt_audio)
+        gen_embedding = self.sv_model(gen_audio)
 
-        similarity = F.cosine_similarity(embedding1, embedding2)[0].item()
+        similarity = F.cosine_similarity(prompt_embedding, gen_embedding)[0].item()
 
         return similarity
