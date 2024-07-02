@@ -109,6 +109,6 @@ class DNSMOS:
             }
             return clip_dict
         elif self.p808:
-            np.mean(predicted_p808_mos)
+            return np.mean(predicted_p808_mos)
         elif self.ovrl:
-            np.mean(predicted_mos_ovr_seg)
+            return np.mean(predicted_mos_ovr_seg)
