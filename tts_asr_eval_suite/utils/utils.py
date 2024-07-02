@@ -21,9 +21,9 @@ def bootstrap_ci_df(df, column_name, metric_func=np.mean, B=5000, alpha=0.05, pr
     ci_lower = np.percentile(bootstrap_stats, 100 * (alpha / 2))
     ci_upper = np.percentile(bootstrap_stats, 100 * (1 - alpha / 2))
 
-    mean = metric_func(data) * 100
-    ci_upper = ci_upper * 100
-    ci_lower = ci_lower * 100
+    mean = metric_func(data)
+    ci_upper = ci_upper
+    ci_lower = ci_lower
 
     margin = (ci_upper - ci_lower) / 2 if not np.isnan(ci_lower) else float("nan")
     formatted_result = f"{mean:.{precision}f}% ± {margin:.{precision}f}%"
