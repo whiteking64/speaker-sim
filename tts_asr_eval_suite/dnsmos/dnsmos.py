@@ -10,7 +10,7 @@ INPUT_LENGTH = 9.01
 
 
 class DNSMOS:
-    def __init__(self, personalized_MOS=False, p808=False, ovrl=True, full=False) -> None:
+    def __init__(self, personalized_MOS=False, p808=False, ovrl=False, sig=True, full=False) -> None:
 
         this_dir = os.path.dirname(os.path.abspath(__file__))
         p808_model_path = os.path.join(this_dir, 'ckpt', 'DNSMOS', 'model_v8.onnx')
@@ -26,6 +26,7 @@ class DNSMOS:
         self.full = full
         self.p808 = p808
         self.ovrl = ovrl
+        self.sig = sig
         self.personalized_MOS = personalized_MOS
 
     def audio_melspec(self, audio, n_mels=120, frame_size=320, hop_length=160, sr=16000, to_db=True):
@@ -112,3 +113,7 @@ class DNSMOS:
             return np.mean(predicted_p808_mos)
         elif self.ovrl:
             return np.mean(predicted_mos_ovr_seg)
+        elif self.sig:
+            return np.mean(predicted_mos_sig_seg)
+        else:
+            return None
