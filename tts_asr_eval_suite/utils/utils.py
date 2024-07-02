@@ -30,9 +30,3 @@ def bootstrap_ci_df(df, column_name, metric_func=np.mean, B=5000, alpha=0.05, pr
     formatted_result = f"{mean:.{precision}f} ± {margin:.{precision}f}"
 
     return formatted_result
-
-
-def torch_rms_norm(wav, db_level=-27.0):
-    r = 10 ** (db_level / 20)
-    a = torch.sqrt((wav.size(-1) * (r**2)) / torch.sum(wav**2))
-    return wav * a
