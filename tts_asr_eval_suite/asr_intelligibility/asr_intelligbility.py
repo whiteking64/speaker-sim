@@ -53,4 +53,5 @@ class ASRIntelligibility:
     def __call__(self, pred_audio, gt_transcript, language="en"):
         transcription = self.transcriber.transcribe_audio(pred_audio, language=language)
         wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
-        return wer, cer
+        result = {"WER": wer, "CER": cer}
+        return result
