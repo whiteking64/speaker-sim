@@ -56,7 +56,7 @@ class DNSMOS:
         aud, input_fs = sf.read(fpath)
         fs = SAMPLING_RATE
         if input_fs != fs:
-            audio = librosa.resample(aud, input_fs, fs)
+            audio = librosa.resample(aud, orig_sr=input_fs, target_sr=fs)
         else:
             audio = aud
         actual_audio_len = len(audio)

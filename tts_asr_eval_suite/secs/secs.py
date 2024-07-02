@@ -2,6 +2,9 @@ import torch
 import torchaudio
 import torch.nn.functional as F
 from huggingface_hub import hf_hub_download
+from pydub import AudioSegment
+
+from tts_asr_eval_suite.utils.utils import torch_rms_norm
 
 
 class SECS:
@@ -16,6 +19,8 @@ class SECS:
 
     def __call__(self, prompt_path, gen_path):
 
+
+
         prompt_audio, sr_prompt = torchaudio.load(prompt_path)
         gen_audio, sr_gen = torchaudio.load(gen_path)
 
@@ -27,6 +32,10 @@ class SECS:
 
         if sr_gen != self.sr:
             gen_audio = torchaudio.functional.resample(gen_audio, sr_gen, self.sr)
+
+        ref_dbfs = AudioSegment.from_file(prompt_path).dBFS
+        prompt_audio = torch_rms_norm(prompt_audio, db_level=ref_dbfs)
+        gen_audio = torch_rms_norm(gen_audio, db_level=ref_dbfs)
 
         prompt_embedding = self.sv_model(prompt_audio)
         gen_embedding = self.sv_model(gen_audio)

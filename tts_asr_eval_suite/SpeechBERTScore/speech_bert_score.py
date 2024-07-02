@@ -1,5 +1,8 @@
 import discrete_speech_metrics as dsm
 import torchaudio
+from pydub import AudioSegment
+
+from tts_asr_eval_suite.utils.utils import torch_rms_norm
 
 
 class SpeechBERTScore:
@@ -21,6 +24,10 @@ class SpeechBERTScore:
             gt_audio = torchaudio.functional.resample(gt_audio, gt_sr, self.sr)
         if gen_sr != self.sr:
             gen_audio = torchaudio.functional.resample(gen_audio, gen_sr, self.sr)
+
+        ref_dbfs = AudioSegment.from_file(gt_audio_path).dBFS
+        gt_audio = torch_rms_norm(gt_audio, db_level=ref_dbfs)
+        gen_audio = torch_rms_norm(gen_audio, db_level=ref_dbfs)
 
         gt_audio = gt_audio[0].numpy()
         gen_audio = gen_audio[0].numpy()

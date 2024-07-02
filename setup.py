@@ -16,6 +16,7 @@ setup(
         "onnxruntime",
         "librosa",
         "soundfile",
+        "pydub",
         "nemo_toolkit[asr]",
         "jiwer",
         "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
