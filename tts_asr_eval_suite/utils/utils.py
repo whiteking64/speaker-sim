@@ -26,6 +26,6 @@ def bootstrap_ci_df(df, column_name, metric_func=np.mean, B=5000, alpha=0.05, pr
     ci_lower = ci_lower
 
     margin = (ci_upper - ci_lower) / 2 if not np.isnan(ci_lower) else float("nan")
-    formatted_result = f"{mean:.{precision}f}% ± {margin:.{precision}f}%"
+    formatted_result = f"{mean:.{precision}f} ± {margin:.{precision}f}"
 
     return formatted_result
