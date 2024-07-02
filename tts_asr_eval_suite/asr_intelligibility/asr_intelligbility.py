@@ -1,37 +1,56 @@
-import os
+import re
 
-import nemo.collections.asr as nemo_asr
+from TTS.tts.layers.xtts.tokenizer import expand_numbers_multilingual
+from faster_whisper import WhisperModel
+from num2words import num2words
 
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
+
+
+def custom_expand_numbers_multilingual(text, lang):
+    # if coqui TTS number expands fails, uses num2words
+    try:
+        text = expand_numbers_multilingual(text, lang)
+    except:
+        if lang == "cs":
+            lang = "cz"
+
+        numbers = re.findall(r'\d+', text)
+        # Transliterate the numbers to text
+        for num in numbers:
+            try:
+                transliterated_num = ''.join(num2words(int(num), lang=lang))
+            except:
+                transliterated_num = num
+            text = text.replace(num, transliterated_num, 1)
+    return text
+
+
+class FasterWhisperSTT(object):
+    def __init__(self, model_name="large-v3", use_cuda=False) -> None:
+        self.model = WhisperModel(model_name, device='cuda' if use_cuda else 'cpu', compute_type="float16")
+        self.segments = None
+
+    def transcribe_audio(self, audio, language=None):
+        segments, _ = self.model.transcribe(audio, beam_size=5, language=language)
+        segments = list(segments)
+        self.segments = segments
+        transcription = "".join([segment.text for segment in segments])
+        # convert number to words
+        transcription = custom_expand_numbers_multilingual(transcription, lang=language)
+        return transcription
+
+    def get_segments(self):
+        return self.segments
 
 
 class ASRIntelligibility:
     def __init__(self, device) -> None:
         self.device = device
-
-        self.asr_model = nemo_asr.models.EncDecRNNTBPEModel.from_pretrained("nvidia/stt_en_conformer_transducer_large").to(
-            device
-        )
-
+        self.transcriber = FasterWhisperSTT("large-v3", use_cuda=device == "cuda")
         self.cer_wer = CERWER()
 
-    def __call__(self, audio_dir, gt_transcripts_path, output_dir=None):
-
-        if os.path.isdir(audio_dir):
-            audio_fnames = [os.path.join(audio_dir, f) for f in os.listdir(audio_dir) if f.endswith(".wav") or f.endswith(".flac")]
-        else:
-            raise ValueError(f"Invalid path: {audio_dir}")
-
-        transcripts = self.asr_model.transcribe(audio_fnames, verbose=True, batch_size=32)[0]
-
-        if output_dir is None:
-            output_dir = audio_dir
-        output_file = os.path.join(output_dir, "asr_transcripts.tsv")
-
-        for audio_fname, transcript in zip(audio_fnames, transcripts):
-            with open(output_file, "a") as f:
-                f.write(f"{audio_fname}\t{transcript}\n")
-
-        cre_wer_scores = self.cer_wer(output_file, gt_transcripts_path)
-
-        return cre_wer_scores
+    def __call__(self, pred_audio, gt_transcript, language="en"):
+        transcription = self.transcriber.transcribe_audio(pred_audio, language=language)
+        wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
+        return wer, cer
