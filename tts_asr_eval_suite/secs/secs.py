@@ -19,8 +19,6 @@ class SECS:
 
     def __call__(self, prompt_path, gen_path):
 
-
-
         prompt_audio, sr_prompt = torchaudio.load(prompt_path)
         gen_audio, sr_gen = torchaudio.load(gen_path)
 
