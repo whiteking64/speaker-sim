@@ -45,13 +45,13 @@ class CERWER:
             wer = compute_wer(gt_transcripts[fname], pred_transcripts[fname])
             cer = compute_cer(gt_transcripts[fname], pred_transcripts[fname])
 
-            results['wer'][fname] = wer
-            results['cer'][fname] = cer
+            results['wer'][fname] = wer * 100
+            results['cer'][fname] = cer * 100
 
         return results
 
     @staticmethod
     def run_single(pred, gt):
-        wer = compute_wer(gt, pred)
-        cer = compute_cer(gt, pred)
+        wer = compute_wer(gt, pred) * 100
+        cer = compute_cer(gt, pred) * 100
         return wer, cer
