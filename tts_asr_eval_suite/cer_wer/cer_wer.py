@@ -2,6 +2,8 @@ import os
 
 import jiwer
 
+from tts_asr_eval_suite.cer_wer.funcs import compute_wer, compute_cer
+
 
 def normalize_sentence(sentence):
     """Normalize sentence"""
@@ -40,10 +42,16 @@ class CERWER:
         results = {'wer': {}, 'cer': {}}
 
         for fname in gt_transcripts.keys():
-            wer = jiwer.wer(normalize_sentence(gt_transcripts[fname]), normalize_sentence(pred_transcripts[fname]))
-            cer = jiwer.cer(normalize_sentence(gt_transcripts[fname]), normalize_sentence(pred_transcripts[fname]))
+            wer = compute_wer(gt_transcripts[fname], pred_transcripts[fname])
+            cer = compute_cer(gt_transcripts[fname], pred_transcripts[fname])
 
             results['wer'][fname] = wer
             results['cer'][fname] = cer
 
         return results
+
+    @staticmethod
+    def run_single(pred, gt):
+        wer = compute_wer(gt, pred)
+        cer = compute_cer(gt, pred)
+        return wer, cer
