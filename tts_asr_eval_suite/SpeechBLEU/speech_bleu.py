@@ -1,5 +1,10 @@
-import discrete_speech_metrics as dsm
+
 import torchaudio
+from contextlib import redirect_stdout
+import io
+stdout_capture = io.StringIO()
+with redirect_stdout(stdout_capture):
+    import discrete_speech_metrics as dsm
 
 
 class SpeechBLEU:
