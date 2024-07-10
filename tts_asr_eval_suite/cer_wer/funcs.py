@@ -34,6 +34,7 @@ else:
     cer_transform = tr.Compose(
         [
             tr.RemoveMultipleSpaces(),
+            tr.RemovePunctuation(),
             tr.Strip(),
             tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
             tr.ReduceToListOfListOfChars(),
@@ -42,11 +43,14 @@ else:
 
 wer_transform = tr.Compose(
     [
-        tr.RemovePunctuation(),
         tr.RemoveMultipleSpaces(),
+        tr.RemovePunctuation(),
         tr.Strip(),
+        tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
+        tr.ReduceToListOfListOfWords(),
     ]
 )
+
 
 def compute_cer(reference, hypothesis):
     reference = reference.lower()
