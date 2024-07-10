@@ -37,7 +37,6 @@ else:
             tr.RemovePunctuation(),
             tr.Strip(),
             tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
-            tr.RemoveWhiteSpace(),
             tr.ReduceToListOfListOfChars(),
         ]
     )
