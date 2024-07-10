@@ -40,6 +40,13 @@ else:
         ]
     )
 
+wer_transform = tr.Compose(
+    [
+        tr.RemovePunctuation(),
+        tr.RemoveMultipleSpaces(),
+        tr.Strip(),
+    ]
+)
 
 def compute_cer(reference, hypothesis):
     reference = reference.lower()
@@ -51,7 +58,7 @@ def compute_cer(reference, hypothesis):
 def compute_wer(reference, hypothesis):
     reference = reference.lower()
     hypothesis = hypothesis.lower()
-    wer = jiwer.wer(reference, hypothesis)
+    wer = jiwer.wer(reference, hypothesis, truth_transform=wer_transform, hypothesis_transform=wer_transform)
     return wer
 
 
