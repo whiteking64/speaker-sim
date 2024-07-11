@@ -20,6 +20,7 @@ setup(
         "num2words",
         "TTS",
         "jiwer",
+        "resemblyzer",
         "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
     ],
 )
