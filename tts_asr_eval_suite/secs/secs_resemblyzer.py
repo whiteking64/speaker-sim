@@ -4,7 +4,7 @@ from resemblyzer import preprocess_wav, VoiceEncoder
 class SECSResemblyzer:
     def __init__(self, device) -> None:
         self.device = device
-        self.sv_model = VoiceEncoder()
+        self.sv_model = VoiceEncoder(device=device, verbose=False)
 
     def __call__(self, prompt_path, gen_path):
 
