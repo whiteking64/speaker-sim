@@ -16,6 +16,11 @@ class SECSWavLM:
         prompt_inputs = self.feature_extractor(prompt_audio.squeeze(), padding=True, return_tensors="pt")
         gen_inputs = self.feature_extractor(gen_audio.squeeze(), padding=True, return_tensors="pt")
 
+        for k, v in prompt_inputs.items():
+            prompt_inputs[k] = v.to(self.device)
+        for k, v in gen_inputs.items():
+            gen_inputs[k] = v.to(self.device)
+
         prompt_embeddings = self.sv_model(**prompt_inputs).embeddings
         gen_embeddings = self.sv_model(**gen_inputs).embeddings
 
