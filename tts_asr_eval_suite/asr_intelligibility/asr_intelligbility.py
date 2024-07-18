@@ -123,23 +123,24 @@ class ASRIntelligibility:
     def __init__(self, device, method) -> None:
         self.device = device
         self.method = method
+        use_cuda = (device == "cuda") or (device == torch.device("cuda"))
         if method == "wav2vec":
             self.transcribers = {
-                "wav2vec": Wav2VecSTT(use_cuda=device == "cuda")
+                "wav2vec": Wav2VecSTT(use_cuda=use_cuda)
             }
         elif method == "hubert":
             self.transcribers = {
-                "hubert": HuBERTSTT(use_cuda=device == "cuda")
+                "hubert": HuBERTSTT(use_cuda=use_cuda)
             }
         elif method == "whisper":
             self.transcribers = {
-                "whisper": FasterWhisperSTT(use_cuda=device == "cuda")
+                "whisper": FasterWhisperSTT(use_cuda=use_cuda)
             }
         elif method == 'all':
             self.transcribers = {
-                "wav2vec": Wav2VecSTT(use_cuda=device == "cuda"),
-                "hubert": HuBERTSTT(use_cuda=device == "cuda"),
-                "whisper": FasterWhisperSTT(use_cuda=device == "cuda")
+                "wav2vec": Wav2VecSTT(use_cuda=use_cuda),
+                "hubert": HuBERTSTT(use_cuda=use_cuda),
+                "whisper": FasterWhisperSTT(use_cuda=use_cuda)
             }
         else:
             raise ValueError("Invalid ASR method")
