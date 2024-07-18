@@ -28,4 +28,4 @@ class MelCepstralDistortion:
 
         score = self.metric.score(gt_audio, gen_audio)
 
-        return score
+        return {"MelCepstralDistortion": score}

@@ -110,10 +110,10 @@ class DNSMOS:
             }
             return clip_dict
         elif self.p808:
-            return np.mean(predicted_p808_mos)
+            return {'DNSMOS (P808)': np.mean(predicted_p808_mos)}
         elif self.ovrl:
-            return np.mean(predicted_mos_ovr_seg)
+            return {'DNSMOS (OVRL)': np.mean(predicted_mos_ovr_seg)}
         elif self.sig:
-            return np.mean(predicted_mos_sig_seg)
+            return {'DNSMOS (SIG)': np.mean(predicted_mos_sig_seg)}
         else:
             return None

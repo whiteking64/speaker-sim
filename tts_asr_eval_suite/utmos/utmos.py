@@ -34,4 +34,4 @@ class UTMOS:
 
         score = self.metric.score(gen_audio)
 
-        return score
+        return {"UTMOS": score}

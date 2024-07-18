@@ -36,4 +36,4 @@ class SpeechTokenDistance:
 
         score = self.metric.score(gt_audio, gen_audio)
 
-        return score
+        return {"SpeechTokenDistance": score}

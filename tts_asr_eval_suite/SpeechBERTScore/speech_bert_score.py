@@ -32,4 +32,4 @@ class SpeechBERTScore:
 
         score, *_ = self.metric.score(gt_audio, gen_audio)
 
-        return score
+        return {"SpeechBERTScore": score}

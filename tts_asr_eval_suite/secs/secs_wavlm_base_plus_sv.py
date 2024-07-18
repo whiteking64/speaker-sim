@@ -3,7 +3,7 @@ import torchaudio
 from transformers import Wav2Vec2FeatureExtractor, WavLMForXVector
 
 
-class SECSWavLM:
+class SECSWavLMBasePlusSV:
     def __init__(self, device) -> None:
         self.device = device
         self.feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained('microsoft/wavlm-base-plus-sv')
