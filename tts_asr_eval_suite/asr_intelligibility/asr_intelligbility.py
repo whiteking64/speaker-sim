@@ -31,7 +31,7 @@ def custom_expand_numbers_multilingual(text, lang):
 
 class FasterWhisperSTT(object):
     def __init__(self, model_name="large-v3", use_cuda=False) -> None:
-        self.model = WhisperModel(model_name, device='cuda' if use_cuda else 'cpu', compute_type="bfloat16")
+        self.model = WhisperModel(model_name, device='cuda' if use_cuda else 'cpu', compute_type="default")
         self.segments = None
 
     def transcribe_audio(self, audio, language=None):
