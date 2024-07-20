@@ -10,7 +10,7 @@ class SECSResemblyzer:
     def __call__(self, prompt_audio, gen_audio):
 
         prompt_audio = preprocess_wav(prompt_audio.squeeze().cpu().numpy(), source_sr=self.sr)
-        gen_audio = preprocess_wav(gen_path.squeeze().cpu().numpy(), source_sr=self.sr)
+        gen_audio = preprocess_wav(gen_audio.squeeze().cpu().numpy(), source_sr=self.sr)
 
         prompt_embedding = self.sv_model.embed_utterance(prompt_audio)
         gen_embedding = self.sv_model.embed_utterance(gen_audio)
