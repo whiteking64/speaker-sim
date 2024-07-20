@@ -9,37 +9,17 @@ import sys
 ALL_PUNCTUATION = "".join((chr(i) for i in range(sys.maxunicode) if unicodedata.category(chr(i)).startswith('P')))
 
 SENTENCE_DELIMITER = ""
-if version.parse(importlib_metadata.version("jiwer")) < version.parse("2.3.0"):
 
-    class SentencesToListOfCharacters(tr.AbstractTransform):
-        def __init__(self, sentence_delimiter: str = " "):
-            self.sentence_delimiter = sentence_delimiter
-
-        def process_string(self, s: str):
-            return list(s)
-
-        def process_list(self, inp):
-            chars = []
-            for sent_idx, sentence in enumerate(inp):
-                chars.extend(self.process_string(sentence))
-                if self.sentence_delimiter is not None and self.sentence_delimiter != "" and sent_idx < len(inp) - 1:
-                    chars.append(self.sentence_delimiter)
-            return chars
-
-
-    cer_transform = tr.Compose(
-        [tr.RemoveMultipleSpaces(), tr.Strip(), SentencesToListOfCharacters(SENTENCE_DELIMITER)]
-    )
-else:
-    cer_transform = tr.Compose(
-        [
-            tr.RemoveMultipleSpaces(),
-            tr.RemovePunctuation(),
-            tr.Strip(),
-            tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
-            tr.ReduceToListOfListOfChars(),
-        ]
-    )
+cer_transform = tr.Compose(
+    [
+        tr.RemoveMultipleSpaces(),
+        tr.RemovePunctuation(),
+        tr.Strip(),
+        tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
+        tr.RemoveWhiteSpace(),
+        tr.ReduceToListOfListOfChars(),
+    ]
+)
 
 wer_transform = tr.Compose(
     [
