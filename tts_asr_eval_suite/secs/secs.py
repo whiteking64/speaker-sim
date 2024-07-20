@@ -42,6 +42,18 @@ class SECS:
 
     def __call__(self, prompt_path, gen_path):
         similarity = {}
+        prompt_audio, sr_prompt = torchaudio.load(prompt_path)
+        gen_audio, sr_gen = torchaudio.load(gen_path)
+
+        prompt_audio = prompt_audio.to(self.device)
+        gen_audio = gen_audio.to(self.device)
+
+        if sr_prompt != self.sr:
+            prompt_audio = torchaudio.functional.resample(prompt_audio, sr_prompt, self.sr)
+
+        if sr_gen != self.sr:
+            gen_audio = torchaudio.functional.resample(gen_audio, sr_gen, self.sr)
+
         for method, scorer in self.scorers.items():
             similarity[f"SECS ({method})"] = scorer(prompt_path, gen_path)
 

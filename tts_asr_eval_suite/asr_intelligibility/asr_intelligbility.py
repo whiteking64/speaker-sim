@@ -5,7 +5,7 @@ import torch
 from TTS.tts.layers.xtts.tokenizer import expand_numbers_multilingual
 from faster_whisper import WhisperModel
 from num2words import num2words
-from transformers import Wav2Vec2Tokenizer, Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC
 
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
 
@@ -57,7 +57,7 @@ class FasterWhisperSTT(object):
 
 class Wav2VecSTT(object):
     def __init__(self, model_name="facebook/wav2vec2-large-960h-lv60-self", device='cpu', sr=16000) -> None:
-        self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(model_name)
+        self.tokenizer = Wav2Vec2Processor.from_pretrained(model_name)
         self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(device)
         self.sr = sr
 
