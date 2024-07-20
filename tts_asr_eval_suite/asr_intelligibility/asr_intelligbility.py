@@ -145,14 +145,22 @@ class ASRIntelligibility:
             raise ValueError("Invalid ASR method")
         self.cer_wer = CERWER()
 
-    def __call__(self, pred_audio, gt_transcript, language="en"):
+    def __call__(self, pred_audio, gt_transcript=None, reference_audio=None, language="en"):
+        assert gt_transcript is not None or reference_audio is not None, \
+            "Either ground truth transcript or reference audio must be provided"
         results = {}
         transcriptions = {}
-        gt_transcript = clean_text(gt_transcript)
+        if gt_transcript is not None:
+            gt_transcript = clean_text(gt_transcript)
         for method, transcriber in self.transcribers.items():
+
             transcription = transcriber.transcribe_audio(pred_audio, language=language)
 
             transcription = clean_text(transcription)
+
+            if gt_transcript is None:
+                gt_transcript = transcriber.transcribe_audio(reference_audio, language=language)
+                gt_transcript = clean_text(gt_transcript)
 
             wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
             results[f"WER ({method})"] = wer
