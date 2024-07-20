@@ -30,8 +30,8 @@ def custom_expand_numbers_multilingual(text, lang):
 
 
 class FasterWhisperSTT(object):
-    def __init__(self, model_name="large-v3", use_cuda=False) -> None:
-        self.model = WhisperModel(model_name, device='cuda' if use_cuda else 'cpu', compute_type="default")
+    def __init__(self, model_name="large-v3", device='cpu') -> None:
+        self.model = WhisperModel(model_name, device=device, compute_type="default")
         self.segments = None
 
     def transcribe_audio(self, audio, language=None):
@@ -48,12 +48,10 @@ class FasterWhisperSTT(object):
 
 
 class Wav2VecSTT(object):
-    def __init__(self, model_name="facebook/wav2vec2-large-960h-lv60-self", use_cuda=False, sr=16000) -> None:
+    def __init__(self, model_name="facebook/wav2vec2-large-960h-lv60-self", device='cpu', sr=16000) -> None:
         self.tokenizer = Wav2Vec2Tokenizer.from_pretrained(model_name)
-        self.model = Wav2Vec2ForCTC.from_pretrained(model_name)
+        self.model = Wav2Vec2ForCTC.from_pretrained(model_name).to(device)
         self.sr = sr
-        if use_cuda:
-            self.model = self.model.cuda()
 
     def cuda(self):
         self.model = self.model.cuda()
@@ -84,12 +82,10 @@ class Wav2VecSTT(object):
 
 
 class HuBERTSTT(object):
-    def __init__(self, model_name="facebook/hubert-large-ls960-ft", use_cuda=False, sr=16000) -> None:
+    def __init__(self, model_name="facebook/hubert-large-ls960-ft", device='cpu', sr=16000) -> None:
         self.tokenizer = Wav2Vec2Processor.from_pretrained(model_name)
-        self.model = HubertForCTC.from_pretrained(model_name)
+        self.model = HubertForCTC.from_pretrained(model_name).to(device)
         self.sr = sr
-        if use_cuda:
-            self.model = self.model.cuda()
 
     def cuda(self):
         self.model = self.model.cuda()
@@ -123,24 +119,23 @@ class ASRIntelligibility:
     def __init__(self, device, method) -> None:
         self.device = device
         self.method = method
-        use_cuda = (device == "cuda") or (device == torch.device("cuda"))
         if method == "wav2vec":
             self.transcribers = {
-                "wav2vec": Wav2VecSTT(use_cuda=use_cuda)
+                "wav2vec": Wav2VecSTT(device=device)
             }
         elif method == "hubert":
             self.transcribers = {
-                "hubert": HuBERTSTT(use_cuda=use_cuda)
+                "hubert": HuBERTSTT(device=device)
             }
         elif method == "whisper":
             self.transcribers = {
-                "whisper": FasterWhisperSTT(use_cuda=use_cuda)
+                "whisper": FasterWhisperSTT(device=device)
             }
         elif method == 'all':
             self.transcribers = {
-                "wav2vec": Wav2VecSTT(use_cuda=use_cuda),
-                "hubert": HuBERTSTT(use_cuda=use_cuda),
-                "whisper": FasterWhisperSTT(use_cuda=use_cuda)
+                "wav2vec": Wav2VecSTT(device=device),
+                "hubert": HuBERTSTT(device=device),
+                "whisper": FasterWhisperSTT(device=device)
             }
         else:
             raise ValueError("Invalid ASR method")
