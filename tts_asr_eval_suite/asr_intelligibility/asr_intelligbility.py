@@ -9,6 +9,8 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC, Wav2Ve
 
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
 
+from tts_asr_eval_suite.asr_intelligibility.text_cleaners import clean_text
+
 
 def custom_expand_numbers_multilingual(text, lang):
     # if coqui TTS number expands fails, uses num2words
@@ -47,8 +49,6 @@ class FasterWhisperSTT(object):
         segments = list(segments)
         self.segments = segments
         transcription = "".join([segment.text for segment in segments])
-        # convert number to words
-        transcription = custom_expand_numbers_multilingual(transcription, lang=language)
         return transcription
 
     def get_segments(self):
@@ -81,8 +81,6 @@ class Wav2VecSTT(object):
         # decode
         transcription = self.tokenizer.batch_decode(predicted_ids)[0]
 
-        # convert number to words
-        transcription = custom_expand_numbers_multilingual(transcription, lang=language)
         return transcription
 
     def get_segments(self):
@@ -115,8 +113,6 @@ class HuBERTSTT(object):
         # decode
         transcription = self.tokenizer.batch_decode(predicted_ids)[0]
 
-        # convert number to words
-        transcription = custom_expand_numbers_multilingual(transcription, lang=language)
         return transcription
 
     def get_segments(self):
@@ -152,8 +148,12 @@ class ASRIntelligibility:
     def __call__(self, pred_audio, gt_transcript, language="en"):
         results = {}
         transcriptions = {}
+        gt_transcript = clean_text(gt_transcript)
         for method, transcriber in self.transcribers.items():
             transcription = transcriber.transcribe_audio(pred_audio, language=language)
+
+            transcription = clean_text(transcription)
+
             wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
             results[f"WER ({method})"] = wer
             results[f"CER ({method})"] = cer
@@ -162,4 +162,4 @@ class ASRIntelligibility:
         results["WER (avg)"] = sum([results[f"WER ({method})"] for method in self.transcribers]) / len(self.transcribers)
         results["CER (avg)"] = sum([results[f"CER ({method})"] for method in self.transcribers]) / len(self.transcribers)
 
-        return results, transcriptions
+        return results, transcriptions, gt_transcript
