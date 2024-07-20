@@ -30,10 +30,10 @@ def custom_expand_numbers_multilingual(text, lang):
 
 
 class FasterWhisperSTT(object):
-    def __init__(self, model_name="large-v3", device='cpu') -> None:
+    def __init__(self, device, model_name="large-v3") -> None:
         if isinstance(device, torch.device):
-            device = device.type
-            device_index = device.index
+            device = str(device.type)
+            device_index = int(device.index)
         else:
             device_index = 0
         self.model = WhisperModel(model_name, device=device, device_index=device_index, compute_type="default")
