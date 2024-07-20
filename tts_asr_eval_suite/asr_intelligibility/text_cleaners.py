@@ -16,7 +16,8 @@ from phonemizer.backend import EspeakBackend
 import inflect
 import re
 
-backend = EspeakBackend('en-us', preserve_punctuation=True, with_stress=True)
+backend = None
+
 
 _inflect = inflect.engine()
 _comma_number_re = re.compile(r'([0-9][0-9\,]+[0-9])')
@@ -170,6 +171,10 @@ def english_cleaners(text):
 
 def english_cleaners2phonemize(text):
     '''Pipeline for English text, including abbreviation expansion. + punctuation + stress'''
+
+    global backend
+    if backend is None:
+        backend = EspeakBackend('en-us', preserve_punctuation=True, with_stress=True)
     text = convert_to_ascii(text)
     text = lowercase(text)
     text = expand_abbreviations(text)
