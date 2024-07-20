@@ -55,7 +55,7 @@ class SECS:
             gen_audio = torchaudio.functional.resample(gen_audio, sr_gen, self.sr)
 
         for method, scorer in self.scorers.items():
-            similarity[f"SECS ({method})"] = scorer(prompt_path, gen_path)
+            similarity[f"SECS ({method})"] = scorer(prompt_audio, gen_audio)
 
         similarity[f"SECS (avg)"] = sum([similarity[f"SECS ({method})"] for method in self.scorers]) / len(self.scorers)
         return similarity
