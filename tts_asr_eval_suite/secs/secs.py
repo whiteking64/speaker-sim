@@ -10,35 +10,26 @@ from tts_asr_eval_suite.secs.secs_wavlm_base_plus_sv import SECSWavLMBasePlusSV
 
 
 class SECS:
-    def __init__(self, device, method) -> None:
+    def __init__(self, device, methods) -> None:
         self.device = device
         self.sr = 16000
+        if len(methods) == 0:
+            methods = ['resemblyzer', 'wavlm_large_sv', 'wavlm_base_plus_sv', 'ecapa2']
+        elif len(methods) == 1 and methods[0] == 'all':
+            methods = ['resemblyzer', 'wavlm_large_sv', 'wavlm_base_plus_sv', 'ecapa2']
 
-        if method == 'resemblyzer':
-            self.scorers = {
-                'resemblyzer': SECSResemblyzer(device),
-            }
-        elif method == 'wavlm_large_sv':
-            self.scorers = {
-                'wavlm_large_sv': SECSWavLMLargeSV(device),
-            }
-        elif method == 'wavlm_base_plus_sv':
-            self.scorers = {
-                'wavlm_base_plus_sv': SECSWavLMBasePlusSV(device),
-            }
-        elif method == 'ecapa2':
-            self.scorers = {
-                'ecapa2': SECSEcapa2(device),
-            }
-        elif method == 'all':
-            self.scorers = {
-                'resemblyzer': SECSResemblyzer(device),
-                'wavlm_large_sv': SECSWavLMLargeSV(device),
-                'wavlm_base_plus_sv': SECSWavLMBasePlusSV(device),
-                'ecapa2': SECSEcapa2(device),
-            }
-        else:
-            raise ValueError(f"Invalid method: {method}")
+        self.scorers = {}
+        for method in methods:
+            if method == 'resemblyzer':
+                self.scorers['resemblyzer'] = SECSResemblyzer(device)
+            elif method == 'wavlm_large_sv':
+                self.scorers['wavlm_large_sv'] = SECSWavLMLargeSV(device)
+            elif method == 'wavlm_base_plus_sv':
+                self.scorers['wavlm_base_plus_sv'] = SECSWavLMBasePlusSV(device)
+            elif method == 'ecapa2':
+                self.scorers['ecapa2'] = SECSEcapa2(device)
+            else:
+                raise ValueError(f"Invalid method: {method}")
 
     def __call__(self, prompt_path, gen_path):
         similarity = {}
