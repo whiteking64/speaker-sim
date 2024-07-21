@@ -47,6 +47,7 @@ class FasterWhisperSTT(object):
         segments = list(segments)
         self.segments = segments
         transcription = "".join([segment.text for segment in segments])
+        transcription = custom_expand_numbers_multilingual(transcription, language)
         return transcription
 
     def get_segments(self):
@@ -78,6 +79,7 @@ class Wav2VecSTT(object):
 
         # decode
         transcription = self.tokenizer.batch_decode(predicted_ids)[0]
+        transcription = custom_expand_numbers_multilingual(transcription, language)
 
         return transcription
 
@@ -110,6 +112,7 @@ class HuBERTSTT(object):
 
         # decode
         transcription = self.tokenizer.batch_decode(predicted_ids)[0]
+        transcription = custom_expand_numbers_multilingual(transcription, language)
 
         return transcription
 
@@ -150,6 +153,7 @@ class ASRIntelligibility:
             if gt_transcript is None:
                 gt_transcript = transcriber.transcribe_audio(reference_audio, language=language)
 
+            gt_transcript = custom_expand_numbers_multilingual(gt_transcript, language)
             wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
             results[f"WER ({method})"] = wer
             results[f"CER ({method})"] = cer
