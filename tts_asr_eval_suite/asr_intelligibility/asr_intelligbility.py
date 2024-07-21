@@ -9,8 +9,6 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC, Wav2Ve
 
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
 
-from tts_asr_eval_suite.asr_intelligibility.text_cleaners import clean_text
-
 
 def custom_expand_numbers_multilingual(text, lang):
     # if coqui TTS number expands fails, uses num2words
@@ -120,29 +118,24 @@ class HuBERTSTT(object):
 
 
 class ASRIntelligibility:
-    def __init__(self, device, method) -> None:
+    def __init__(self, device, methods) -> None:
         self.device = device
-        self.method = method
-        if method == "wav2vec":
-            self.transcribers = {
-                "wav2vec": Wav2VecSTT(device=device)
-            }
-        elif method == "hubert":
-            self.transcribers = {
-                "hubert": HuBERTSTT(device=device)
-            }
-        elif method == "whisper":
-            self.transcribers = {
-                "whisper": FasterWhisperSTT(device=device)
-            }
-        elif method == 'all':
-            self.transcribers = {
-                "wav2vec": Wav2VecSTT(device=device),
-                "hubert": HuBERTSTT(device=device),
-                "whisper": FasterWhisperSTT(device=device)
-            }
-        else:
-            raise ValueError("Invalid ASR method")
+
+        if len(methods) == 0:
+            methods = ["wav2vec", "hubert", "whisper"]
+        elif len(methods) == 1 and methods[0] == "all":
+            methods = ["wav2vec", "hubert", "whisper"]
+        self.transcribers = {}
+        for method in methods:
+            if method == "wav2vec":
+                self.transcribers["wav2vec"] = Wav2VecSTT(device=device)
+            elif method == "hubert":
+                self.transcribers["hubert"] = HuBERTSTT(device=device)
+            elif method == "whisper":
+                self.transcribers["whisper"] = FasterWhisperSTT(device=device)
+            else:
+                raise ValueError(f"Invalid method: {method}")
+
         self.cer_wer = CERWER()
 
     def __call__(self, pred_audio, gt_transcript=None, reference_audio=None, language="en"):
@@ -150,17 +143,12 @@ class ASRIntelligibility:
             "Either ground truth transcript or reference audio must be provided"
         results = {}
         transcriptions = {}
-        if gt_transcript is not None:
-            gt_transcript = clean_text(gt_transcript)
         for method, transcriber in self.transcribers.items():
 
             transcription = transcriber.transcribe_audio(pred_audio, language=language)
 
-            transcription = clean_text(transcription)
-
             if gt_transcript is None:
                 gt_transcript = transcriber.transcribe_audio(reference_audio, language=language)
-                gt_transcript = clean_text(gt_transcript)
 
             wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
             results[f"WER ({method})"] = wer

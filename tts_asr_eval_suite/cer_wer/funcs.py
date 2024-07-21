@@ -13,6 +13,7 @@ SENTENCE_DELIMITER = ""
 cer_transform = tr.Compose(
     [
         tr.RemoveMultipleSpaces(),
+        tr.RemoveWhiteSpace(replace_by_space=True),
         tr.RemovePunctuation(),
         tr.Strip(),
         tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
@@ -23,6 +24,7 @@ cer_transform = tr.Compose(
 wer_transform = tr.Compose(
     [
         tr.RemoveMultipleSpaces(),
+        tr.RemoveWhiteSpace(replace_by_space=True),
         tr.RemovePunctuation(),
         tr.Strip(),
         tr.ReduceToSingleSentence(SENTENCE_DELIMITER),
