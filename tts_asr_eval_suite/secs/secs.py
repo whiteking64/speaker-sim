@@ -3,6 +3,8 @@ import torch.nn.functional as F
 import torchaudio
 from huggingface_hub import hf_hub_download
 
+from resemblyzer import preprocess_wav
+
 from tts_asr_eval_suite.secs.secs_ecapa2 import SECSEcapa2
 from tts_asr_eval_suite.secs.secs_resemblyzer import SECSResemblyzer
 from tts_asr_eval_suite.secs.secs_unispeech_ecapa_wavlm_large import SECSWavLMLargeSV
@@ -36,14 +38,11 @@ class SECS:
         prompt_audio, sr_prompt = torchaudio.load(prompt_path)
         gen_audio, sr_gen = torchaudio.load(gen_path)
 
-        prompt_audio = prompt_audio.to(self.device)
-        gen_audio = gen_audio.to(self.device)
+        prompt_audio = preprocess_wav(prompt_audio.squeeze().numpy(), source_sr=sr_prompt)
+        gen_audio = preprocess_wav(gen_audio.squeeze().numpy(), source_sr=sr_gen)
 
-        if sr_prompt != self.sr:
-            prompt_audio = torchaudio.functional.resample(prompt_audio, sr_prompt, self.sr)
-
-        if sr_gen != self.sr:
-            gen_audio = torchaudio.functional.resample(gen_audio, sr_gen, self.sr)
+        prompt_audio = prompt_audio.to(self.device).unsqueeze(0)
+        gen_audio = gen_audio.to(self.device).unsqueeze(0)
 
         for method, scorer in self.scorers.items():
             similarity[f"SECS ({method})"] = scorer(prompt_audio, gen_audio)
