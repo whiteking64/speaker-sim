@@ -10,6 +10,16 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC, Wav2Ve
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
 
 
+def normalize_text(text):
+    # remove ponctuation
+    text = text.translate(str.maketrans('', '', ALL_PUNCTUATION))
+    text = text.lower()
+    text = ' '.join(text.split())
+    if not text:
+        text = " "
+    return text
+
+
 def custom_expand_numbers_multilingual(text, lang):
     # if coqui TTS number expands fails, uses num2words
     try:
@@ -154,6 +164,10 @@ class ASRIntelligibility:
                 gt_transcript = transcriber.transcribe_audio(reference_audio, language=language)
 
             gt_transcript = custom_expand_numbers_multilingual(gt_transcript, language)
+
+            transcription = normalize_text(transcription)
+            gt_transcript = normalize_text(gt_transcript)
+
             wer, cer = self.cer_wer.run_single(transcription, gt_transcript)
             results[f"WER ({method})"] = wer
             results[f"CER ({method})"] = cer
