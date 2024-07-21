@@ -9,8 +9,8 @@ class SECSResemblyzer:
 
     def __call__(self, prompt_audio, gen_audio):
 
-        prompt_embedding = self.sv_model.embed_utterance(prompt_audio.cpu().numpy())
-        gen_embedding = self.sv_model.embed_utterance(gen_audio.cpu().numpy())
+        prompt_embedding = self.sv_model.embed_utterance(prompt_audio.squeeze().cpu().numpy())
+        gen_embedding = self.sv_model.embed_utterance(gen_audio.squeeze().cpu().numpy())
 
         similarity = prompt_embedding @ gen_embedding
 
