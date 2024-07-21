@@ -6,8 +6,13 @@ from TTS.tts.layers.xtts.tokenizer import expand_numbers_multilingual
 from faster_whisper import WhisperModel
 from num2words import num2words
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, HubertForCTC, Wav2Vec2Tokenizer
+import unicodedata
+import sys
 
 from tts_asr_eval_suite.cer_wer.cer_wer import CERWER
+
+
+ALL_PUNCTUATION = "".join((chr(i) for i in range(sys.maxunicode) if unicodedata.category(chr(i)).startswith('P')))
 
 
 def normalize_text(text):
