@@ -41,8 +41,8 @@ class SECS:
         prompt_audio = preprocess_wav(prompt_audio.squeeze().numpy(), source_sr=sr_prompt)
         gen_audio = preprocess_wav(gen_audio.squeeze().numpy(), source_sr=sr_gen)
 
-        prompt_audio = prompt_audio.to(self.device).unsqueeze(0)
-        gen_audio = gen_audio.to(self.device).unsqueeze(0)
+        prompt_audio = torch.from_numpy(prompt_audio).to(self.device).unsqueeze(0)
+        gen_audio = torch.from_numpy(gen_audio).to(self.device).unsqueeze(0)
 
         for method, scorer in self.scorers.items():
             similarity[f"SECS ({method})"] = scorer(prompt_audio, gen_audio)
