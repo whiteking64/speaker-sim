@@ -21,6 +21,6 @@ setup(
         "TTS",
         "jiwer",
         "resemblyzer",
-        "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
+        # "discrete-speech-metrics @ git+https://github.com/Takaaki-Saeki/DiscreteSpeechMetrics.git",
     ],
 )
