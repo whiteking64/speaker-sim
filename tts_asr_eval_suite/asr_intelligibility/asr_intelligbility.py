@@ -57,7 +57,7 @@ class FasterWhisperSTT(object):
         self.model = WhisperModel(model_name, device=device_name, device_index=device_index, compute_type="default")
         self.segments = None
 
-    def transcribe_audio(self, audio, language=None):
+    def transcribe_audio(self, audio, language="en"):
         segments, _ = self.model.transcribe(audio, beam_size=5, language=language)
         segments = list(segments)
         self.segments = segments
@@ -81,7 +81,7 @@ class Wav2VecSTT(object):
     def cpu(self):
         self.model = self.model.cpu()
 
-    def transcribe_audio(self, audio, language=None):
+    def transcribe_audio(self, audio, language="en"):
         input_audio, _ = librosa.load(audio, sr=self.sr)
         input_values = self.tokenizer(input_audio, return_tensors="pt", padding="longest").input_values
 
@@ -114,7 +114,7 @@ class HuBERTSTT(object):
     def cpu(self):
         self.model = self.model.cpu()
 
-    def transcribe_audio(self, audio, language=None):
+    def transcribe_audio(self, audio, language="en"):
         input_audio, _ = librosa.load(audio, sr=self.sr)
         input_values = self.tokenizer(input_audio, return_tensors="pt", padding="longest").input_values
 
@@ -135,14 +135,31 @@ class HuBERTSTT(object):
         return None
 
 
+class NemoSTT(object):
+    def __init__(self, device='cpu') -> None:
+        import nemo.collections.asr as nemo_asr
+        self.asr_model = nemo_asr.models.EncDecRNNTBPEModel.from_pretrained("nvidia/stt_en_conformer_transducer_xlarge").eval().to(device)
+
+    def cuda(self):
+        self.asr_model = self.asr_model.cuda()
+
+    def cpu(self):
+        self.asr_model = self.asr_model.cpu()
+
+    def transcribe_audio(self, audio, language="en"):
+        transcript = self.asr_model.transcribe(paths2audio_files=[audio])[0][0]
+        transcript = custom_expand_numbers_multilingual(transcript, language)
+        return transcript
+
+
 class ASRIntelligibility:
     def __init__(self, device, methods) -> None:
         self.device = device
 
         if len(methods) == 0:
-            methods = ["wav2vec", "hubert", "whisper"]
+            methods = ["wav2vec", "hubert", "whisper", "nemo"]
         elif len(methods) == 1 and methods[0] == "all":
-            methods = ["wav2vec", "hubert", "whisper"]
+            methods = ["wav2vec", "hubert", "whisper", "nemo"]
         self.transcribers = {}
         for method in methods:
             if method == "wav2vec":
@@ -151,6 +168,8 @@ class ASRIntelligibility:
                 self.transcribers["hubert"] = HuBERTSTT(device=device)
             elif method == "whisper":
                 self.transcribers["whisper"] = FasterWhisperSTT(device=device)
+            elif method == "nemo":
+                self.transcribers["nemo"] = NemoSTT()
             else:
                 raise ValueError(f"Invalid method: {method}")
 
