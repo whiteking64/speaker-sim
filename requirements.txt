@@ -1,0 +1,7 @@
+streamlit
+torch
+torchaudio
+Resemblyzer
+transformers
+numpy
+s3prl

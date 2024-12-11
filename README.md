@@ -1,11 +1,12 @@
-# [WIP] tts-eval-suite
-A suite of various automatic evaluation metrics for ASR, TTS and VC
+# Speaker Similarity App
 
+## Prerequisites
+- Python 3.12.4
 
-# Please first install numpy, pypesq and Cython before running setup.py
-
-```shell
-pip install 'numpy<2'
-pip install pypesq@https://github.com/vBaiCai/python-pesq/archive/master.zip
-pip install Cython
+## Start the app
+```bash
+streamlit run app.py
 ```
+
+## Acknowledgements
+This repository is based on the [tts-asr-eval-suite](https://github.com/naba89/tts-asr-eval-suite/tree/main) repository.

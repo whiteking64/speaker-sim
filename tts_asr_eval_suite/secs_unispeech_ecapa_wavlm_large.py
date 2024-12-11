@@ -1,9 +1,8 @@
 """Copyright: Nabarun Goswami (2024)."""
-from tts_asr_eval_suite.secs.unispeech_ecapa_tdnn.ecapa_tdnn import ECAPA_TDNN_SMALL
+from tts_asr_eval_suite.unispeech_ecapa_tdnn.ecapa_tdnn import ECAPA_TDNN_SMALL
 
 import torch
 import torch.nn.functional as F
-import torchaudio
 from huggingface_hub import hf_hub_download
 
 

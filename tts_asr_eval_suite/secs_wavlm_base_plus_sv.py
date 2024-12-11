@@ -1,5 +1,4 @@
 import torch.nn.functional as F
-import torchaudio
 from transformers import Wav2Vec2FeatureExtractor, WavLMForXVector
 
 

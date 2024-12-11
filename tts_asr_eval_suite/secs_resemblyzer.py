@@ -1,4 +1,4 @@
-from resemblyzer import preprocess_wav, VoiceEncoder
+from resemblyzer import VoiceEncoder
 
 
 class SECSResemblyzer:

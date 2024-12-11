@@ -1,14 +1,30 @@
 import torch
-import torch.nn.functional as F
 import torchaudio
-from huggingface_hub import hf_hub_download
 
 from resemblyzer import preprocess_wav
 
-from tts_asr_eval_suite.secs.secs_ecapa2 import SECSEcapa2
-from tts_asr_eval_suite.secs.secs_resemblyzer import SECSResemblyzer
-from tts_asr_eval_suite.secs.secs_unispeech_ecapa_wavlm_large import SECSWavLMLargeSV
-from tts_asr_eval_suite.secs.secs_wavlm_base_plus_sv import SECSWavLMBasePlusSV
+from tts_asr_eval_suite.secs_ecapa2 import SECSEcapa2
+from tts_asr_eval_suite.secs_resemblyzer import SECSResemblyzer
+from tts_asr_eval_suite.secs_unispeech_ecapa_wavlm_large import SECSWavLMLargeSV
+from tts_asr_eval_suite.secs_wavlm_base_plus_sv import SECSWavLMBasePlusSV
+
+
+def load_and_preprocess(file_path: str, target_sr: int, device: str) -> torch.Tensor:
+    """Load and preprocess audio file."""
+    audio, sr = torchaudio.load(file_path)
+
+    # Convert stereo to mono if necessary
+    if audio.shape[0] == 2:
+        audio = audio.mean(dim=0, keepdim=True)
+
+    # Resample if necessary
+    if sr != target_sr:
+        audio = torchaudio.transforms.Resample(sr, target_sr)(audio)
+
+    audio = preprocess_wav(audio.squeeze().numpy(), source_sr=target_sr)
+    audio = torch.from_numpy(audio).to(device).unsqueeze(0)
+
+    return audio
 
 
 class SECS:
@@ -35,17 +51,12 @@ class SECS:
 
     def __call__(self, prompt_path, gen_path):
         similarity = {}
-        prompt_audio, sr_prompt = torchaudio.load(prompt_path)
-        gen_audio, sr_gen = torchaudio.load(gen_path)
 
-        prompt_audio = preprocess_wav(prompt_audio.squeeze().numpy(), source_sr=sr_prompt)
-        gen_audio = preprocess_wav(gen_audio.squeeze().numpy(), source_sr=sr_gen)
-
-        prompt_audio = torch.from_numpy(prompt_audio).to(self.device).unsqueeze(0)
-        gen_audio = torch.from_numpy(gen_audio).to(self.device).unsqueeze(0)
+        prompt_audio = load_and_preprocess(prompt_path, self.sr, self.device)
+        gen_audio = load_and_preprocess(gen_path, self.sr, self.device)
 
         for method, scorer in self.scorers.items():
             similarity[f"SECS ({method})"] = scorer(prompt_audio, gen_audio)
 
-        similarity[f"SECS (avg)"] = sum([similarity[f"SECS ({method})"] for method in self.scorers]) / len(self.scorers)
+        # similarity["SECS (avg)"] = sum([similarity[f"SECS ({method})"] for method in self.scorers]) / len(self.scorers)
         return similarity
